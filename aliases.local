@@ -1,0 +1,7 @@
+alias ga="git add . && git add -u"
+alias powr="touch ~/.pow/restart.txt"
+alias dc="docker-compose"
+alias venv="export WORKON_HOME=$HOME/.virtualenvs; export PROJECT_HOME=$HOME/Devel; source /usr/local/bin/virtualenvwrapper.sh"
+alias redis="redis-server /usr/local/etc/redis.conf"
+alias dstopall="docker stop $(docker ps -a -q)"
+alias dremoveall="docker rm $(docker ps -a -q)"

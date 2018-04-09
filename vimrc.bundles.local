@@ -1,0 +1,4 @@
+Plug 'pangloss/vim-javascript'
+Plug 'mxw/vim-jsx'
+Plug 'alvan/vim-closetag'
+Plug 'prettier/vim-prettier', { 'do': 'yarn install' }
