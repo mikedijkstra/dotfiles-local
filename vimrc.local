@@ -16,10 +16,6 @@ augroup FormatAutogroup
   autocmd BufWritePost * FormatWrite
 augroup END
 
-set termguicolors
-
-syntax enable
-colorscheme night-owl
-
-" To enable the lightline theme
-let g:lightline = { 'colorscheme': 'nightowl' }
+nnoremap <silent> <Leader>gb :Git blame<CR>
+nnoremap <silent> <Leader>go :GBrowse <CR>
+nnoremap <silent> <Leader>gd :Gdiffsplit<CR>

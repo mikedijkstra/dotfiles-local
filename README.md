@@ -6,4 +6,5 @@ brew tap homebrew/cask-fonts
 brew install --cask font-fira-code
 brew install tree-sitter
 brew install tmuxp
+npm install -g prettierd
 ```
