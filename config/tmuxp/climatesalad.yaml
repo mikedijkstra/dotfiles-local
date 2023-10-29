@@ -1,0 +1,16 @@
+session_name: climate-salad
+windows:
+  - window_name: nvim
+    layout: tiled
+    shell_command_before:
+      - cd ~/Code/climate-salad
+    panes:
+      - shell_command:
+          - nvim
+  - window_name: servers
+    layout: tiled
+    shell_command_before:
+      - cd ~/Code/climate-salad
+    panes:
+      - shell_command:
+          - npm run dev

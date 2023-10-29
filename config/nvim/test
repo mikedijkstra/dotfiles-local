@@ -1,0 +1,275 @@
+
+vim.o.runtimepath = vim.o.runtimepath .. ',~/.vim,~/.vim/after'
+vim.o.packpath = vim.o.runtimepath
+vim.cmd('source ~/.vimrc')
+
+local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
+if not vim.loop.fs_stat(lazypath) then
+  vim.fn.system({
+    "git",
+    "clone",
+    "--filter=blob:none",
+    "https://github.com/folke/lazy.nvim.git",
+    "--branch=stable", -- latest stable release
+    lazypath,
+  })
+end
+vim.opt.rtp:prepend(lazypath)
+
+require("lazy").setup({
+  "neovim/nvim-lspconfig",
+  "williamboman/mason.nvim",
+})
+
+require("mason").setup()
+
+require("mason-lspconfig").setup {
+  ensure_installed = { "lua_ls", "tsserver", "html", "jsonls", "tailwindcss", "cssls" },
+}
+require("lspconfig").lua_ls.setup({})
+require'lspconfig'.tsserver.setup{}
+require'lspconfig'.html.setup{}
+require'lspconfig'.jsonls.setup{}
+require'lspconfig'.tailwindcss.setup{}
+require'lspconfig'.cssls.setup{}
+
+
+
+
+
+
+vim.o.runtimepath = vim.o.runtimepath .. ',~/.vim,~/.vim/after'
+vim.o.packpath = vim.o.runtimepath
+vim.cmd('source ~/.vimrc')
+
+local cmp = require('cmp')
+local luasnip = require('luasnip')
+
+cmp.setup({
+  sources = {
+    { name = 'nvim_lsp' },
+  },
+  mapping = cmp.mapping.preset.insert({
+    ['<C-Space>'] = cmp.mapping.complete(),
+    ['<C-u>'] = cmp.mapping.scroll_docs(-4),
+    ['<C-d>'] = cmp.mapping.scroll_docs(4),
+  }),
+  snippet = {
+    expand = function(args)
+      luasnip.lsp_expand(args.body)
+    end
+  },
+})
+
+local lsp_cmds = vim.api.nvim_create_augroup('lsp_cmds', { clear = true })
+
+vim.api.nvim_create_autocmd('LspAttach', {
+  group = lsp_cmds,
+  desc = 'LSP actions',
+  callback = function()
+    local bufmap = function(mode, lhs, rhs)
+      vim.keymap.set(mode, lhs, rhs, { buffer = true })
+    end
+
+    bufmap('n', 'K', '<cmd>lua vim.lsp.buf.hover()<cr>')
+    bufmap('n', 'gd', '<cmd>lua vim.lsp.buf.definition()<cr>')
+    bufmap('n', 'gD', '<cmd>lua vim.lsp.buf.declaration()<cr>')
+    bufmap('n', 'gi', '<cmd>lua vim.lsp.buf.implementation()<cr>')
+    bufmap('n', 'go', '<cmd>lua vim.lsp.buf.type_definition()<cr>')
+    bufmap('n', 'gr', '<cmd>lua vim.lsp.buf.references()<cr>')
+    bufmap('n', 'gs', '<cmd>lua vim.lsp.buf.signature_help()<cr>')
+    bufmap('n', '<F2>', '<cmd>lua vim.lsp.buf.rename()<cr>')
+    bufmap({ 'n', 'x' }, '<F3>', '<cmd>lua vim.lsp.buf.format({async = true})<cr>')
+    bufmap('n', '<F4>', '<cmd>lua vim.lsp.buf.code_action()<cr>')
+    bufmap('n', 'gl', '<cmd>lua vim.diagnostic.open_float()<cr>')
+    bufmap('n', '[d', '<cmd>lua vim.diagnostic.goto_prev()<cr>')
+    bufmap('n', ']d', '<cmd>lua vim.diagnostic.goto_next()<cr>')
+  end
+})
+
+local lspconfig = require('lspconfig')
+local lsp_defaults = lspconfig.util.default_config
+
+lsp_defaults.capabilities = vim.tbl_deep_extend(
+  'force',
+  lsp_defaults.capabilities,
+  require('cmp_nvim_lsp').default_capabilities()
+)
+
+require('mason').setup({})
+require('mason-lspconfig').setup({
+  ensure_installed = {
+    'tsserver',
+    'eslint',
+    'html',
+    'cssls'
+  },
+  handlers = {
+    function(server)
+      lspconfig[server].setup({})
+    end,
+    ['tsserver'] = function()
+      lspconfig.tsserver.setup({
+        settings = {
+          completions = {
+            completeFunctionCalls = true
+          }
+        }
+      })
+    end
+  }
+})
+
+-- Utilities for creating configurations
+local util = require "formatter.util"
+
+-- Provides the Format, FormatWrite, FormatLock, and FormatWriteLock commands
+require("formatter").setup {
+  -- Enable or disable logging
+  logging = true,
+  -- Set the log level
+  log_level = vim.log.levels.WARN,
+  -- All formatter configurations are opt-in
+  filetype = {
+    -- Use the special "*" filetype for defining formatter configurations on
+    -- any filetype
+    ["*"] = {
+      -- "formatter.filetypes.any" defines default configurations for any
+      -- filetype
+      require("formatter.filetypes.any").remove_trailing_whitespace
+    }
+  }
+}
+
+local has_formatter, formatter = pcall(require, 'formatter')
+
+if not has_formatter then
+  return
+end
+
+local au = require '._.utils.au'
+
+local function prettier()
+  return {
+    exe = 'prettier',
+    args = {
+      '--config-precedence',
+      'prefer-file',
+      '--single-quote',
+      '--no-bracket-spacing',
+      '--prose-wrap',
+      'always',
+      '--arrow-parens',
+      'always',
+      '--trailing-comma',
+      'all',
+      '--no-semi',
+      '--end-of-line',
+      'lf',
+      '--print-width',
+      vim.bo.textwidth,
+      '--stdin-filepath',
+      vim.fn.shellescape(vim.api.nvim_buf_get_name(0)),
+    },
+    stdin = true,
+  }
+end
+
+local function shfmt()
+  return {
+    exe = 'shfmt',
+    args = { '-' },
+    stdin = true,
+  }
+end
+
+au.augroup('__formatter__', function()
+  au.autocmd('BufWritePre', '*', 'FormatWrite')
+end)
+
+formatter.setup {
+  logging = false,
+  filetype = {
+    javascript = { prettier },
+    typescript = { prettier },
+    javascriptreact = { prettier },
+    typescriptreact = { prettier },
+    vue = { prettier },
+    ['javascript.jsx'] = { prettier },
+    ['typescript.tsx'] = { prettier },
+    markdown = { prettier },
+    css = { prettier },
+    json = { prettier },
+    jsonc = { prettier },
+    scss = { prettier },
+    less = { prettier },
+    yaml = { prettier },
+    graphql = { prettier },
+    html = { prettier },
+    sh = { shfmt },
+    bash = { shfmt },
+    reason = {
+      function()
+        return {
+          exe = 'refmt',
+          stdin = true,
+        }
+      end,
+    },
+    rust = {
+      function()
+        return {
+          exe = 'rustfmt',
+          args = { '--emit=stdout' },
+          stdin = true,
+        }
+      end,
+    },
+    python = {
+      function()
+        return {
+          exe = 'black',
+          args = { '--quiet', '-' },
+          stdin = true,
+        }
+      end,
+    },
+    go = {
+      function()
+        return {
+          exe = 'gofmt',
+          stdin = true,
+        }
+      end,
+    },
+    nix = {
+      function()
+        return {
+          exe = 'nixpkgs-fmt',
+          stdin = true,
+        }
+      end,
+    },
+    lua = {
+      function()
+        return {
+          exe = 'stylua',
+          args = {
+            '--indent-type',
+            'Spaces',
+            '--line-endings',
+            'Unix',
+            '--quote-style',
+            'AutoPreferSingle',
+            '--indent-width',
+            vim.bo.tabstop,
+            '--column-width',
+            vim.bo.textwidth,
+            '-',
+          },
+          stdin = true,
+        }
+      end,
+    },
+  },
+}

@@ -1,0 +1,25 @@
+set history=500
+set number
+set relativenumber
+set noruler
+
+map <Space><Space> :Ex<cr>
+
+augroup ale
+  autocmd!
+  let g:ale_lint_on_text_changed = 0
+  let g:ale_lint_on_enter = 0
+augroup END
+
+augroup FormatAutogroup
+  autocmd!
+  autocmd BufWritePost * FormatWrite
+augroup END
+
+set termguicolors
+
+syntax enable
+colorscheme night-owl
+
+" To enable the lightline theme
+let g:lightline = { 'colorscheme': 'nightowl' }
