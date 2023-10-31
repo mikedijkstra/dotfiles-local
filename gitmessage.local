@@ -1,0 +1,26 @@
+
+
+# 50-character subject line
+#
+# type(scope): description
+#
+# Possible types:
+#
+# ✨ feat:
+# 🐛 fix:
+# 📚 docs:
+# 💎 style:
+# 🔨 refactor:
+# 🚀 perf:
+# 🚨 test:
+# 📦 build:
+# 👷 ci:
+# 🔧 chore:
+#
+# 72-character wrapped longer description. This should answer:
+#
+# * Why was this change necessary?
+# * How does it address the problem?
+# * Are there any side effects?
+#
+# Include a link to the ticket, if any.

@@ -53,7 +53,7 @@ ts.setup {
     disable = {},
   },
   ensure_installed = {
-    --"tsx",
+    "tsx",
     "toml",
     "fish",
     "php",
@@ -98,6 +98,11 @@ end
 local fb_actions = require "telescope".extensions.file_browser.actions
 
 telescope.setup {
+  extensions = {
+    file_browser = {
+      respect_gitignore = true
+    }
+  },
   defaults = {
     mappings = {
       n = {
@@ -161,20 +166,6 @@ telescope.setup {
     },
   },
 }
-telescope.load_extension("file_browser")
-
-vim.keymap.set("n", "sf", function()
-  telescope.extensions.file_browser.file_browser({
-    path = "%:p:h",
-    cwd = telescope_buffer_dir(),
-    respect_gitignore = false,
-    hidden = true,
-    grouped = true,
-    previewer = false,
-    initial_mode = "normal",
-    layout_config = { height = 40 }
-  })
-end)
 
 -- lspsaga
 local status, saga = pcall(require, "lspsaga")
@@ -188,11 +179,13 @@ saga.setup {
 
 local opts = { noremap = true, silent = true }
 vim.keymap.set('n', '<C-j>', '<Cmd>Lspsaga diagnostic_jump_next<CR>', opts)
-vim.keymap.set('n', 'K', '<Cmd>Lspsaga hover_doc<CR>', opts)
-vim.keymap.set('n', 'gd', '<Cmd>Lspsaga lsp_finder<CR>', opts)
-vim.keymap.set('n', '<C-k>', '<Cmd>Lspsaga show_line_diagnostics<CR>', opts)
+vim.keymap.set('n', '<C-d>', '<Cmd>Lspsaga hover_doc<CR>', opts)
+vim.keymap.set('n', '<C-f>', '<Cmd>Lspsaga code_action<CR>', opts)
+vim.keymap.set('n', '<C-g>', '<Cmd>Lspsaga show_line_diagnostics<CR>', opts)
 vim.keymap.set('i', '<C-k>', '<Cmd>Lspsaga signature_help<CR>', opts)
 vim.keymap.set('n', 'gp', '<Cmd>Lspsaga preview_definition<CR>', opts)
+vim.keymap.set('n', 'gd', vim.lsp.buf.definition, opts)
+vim.keymap.set('n', '<space>D', vim.lsp.buf.type_definition, opts)
 vim.keymap.set('n', 'gr', '<Cmd>Lspsaga rename<CR>', opts)
 
 -- Prettier
@@ -212,7 +205,11 @@ lspconfig.setup {
 -- lspconfig
 local nvim_lsp = require "lspconfig"
 nvim_lsp.tailwindcss.setup {}
-nvim_lsp.tsserver.setup{}
+nvim_lsp.tsserver.setup {
+  on_attach = on_attach,
+  filetypes = { "typescript", "typescriptreact", "typescript.tsx" },
+  cmd = { "typescript-language-server", "--stdio" }
+}
 nvim_lsp.html.setup{}
 nvim_lsp.jsonls.setup{}
 nvim_lsp.tailwindcss.setup{}
@@ -270,17 +267,6 @@ require("formatter").setup {
     }
 }
 
--- Format on save (disabled cuz it gets on my f@cking nerves with tailwind)
--- vim.api.nvim_exec(
---     [[
---         augroup FormatAutogroup
---             autocmd!
---             autocmd BufWritePost * FormatWrite
---         augroup END
---     ]],
---     true
--- )
-
 -- leader f to format
 vim.api.nvim_set_keymap(
     "n",
@@ -291,3 +277,110 @@ vim.api.nvim_set_keymap(
         silent = true
     }
 )
+
+-- Lualine
+
+local status, lualine = pcall(require, "lualine")
+if (not status) then return end
+
+lualine.setup {
+  options = {
+    icons_enabled = true,
+    theme = 'night-owl',
+    section_separators = { left = '', right = '' },
+    component_separators = { left = '', right = '' },
+    disabled_filetypes = {}
+  },
+  sections = {
+    lualine_a = { 'mode' },
+    lualine_b = { 'branch' },
+    lualine_c = { {
+      'filename',
+      file_status = true, -- displays file status (readonly status, modified status)
+      path = 0 -- 0 = just filename, 1 = relative path, 2 = absolute path
+    } },
+    lualine_x = {
+      { 'diagnostics', sources = { "nvim_diagnostic" }, symbols = { error = ' ', warn = ' ', info = ' ',
+        hint = ' ' } },
+      'encoding',
+      'filetype'
+    },
+    lualine_y = { 'progress' },
+    lualine_z = { 'location' }
+  },
+  inactive_sections = {
+    lualine_a = {},
+    lualine_b = {},
+    lualine_c = { {
+      'filename',
+      file_status = true, -- displays file status (readonly status, modified status)
+      path = 1 -- 0 = just filename, 1 = relative path, 2 = absolute path
+    } },
+    lualine_x = { 'location' },
+    lualine_y = {},
+    lualine_z = {}
+  },
+  tabline = {},
+  extensions = { 'fugitive' }
+}
+
+vim.opt.signcolumn = "yes"
+
+require'barbar'.setup {
+  icons = {
+    diagnostics = {
+      [vim.diagnostic.severity.ERROR] = {enabled = true},
+      [vim.diagnostic.severity.WARN] = {enabled = true},
+      [vim.diagnostic.severity.INFO] = {enabled = true},
+      [vim.diagnostic.severity.HINT] = {enabled = true},
+    },
+    gitsigns = {
+      added = {enabled = true, icon = '+'},
+      changed = {enabled = true, icon = '~'},
+      deleted = {enabled = true, icon = '-'},
+    },
+  }
+}
+
+require('gitsigns').setup {
+  signs = {
+    add          = { text = '│' },
+    change       = { text = '│' },
+    delete       = { text = '_' },
+    topdelete    = { text = '‾' },
+    changedelete = { text = '~' },
+    untracked    = { text = '┆' },
+  },
+  signcolumn = true,  -- Toggle with `:Gitsigns toggle_signs`
+  numhl      = false, -- Toggle with `:Gitsigns toggle_numhl`
+  linehl     = false, -- Toggle with `:Gitsigns toggle_linehl`
+  word_diff  = false, -- Toggle with `:Gitsigns toggle_word_diff`
+  watch_gitdir = {
+    follow_files = true
+  },
+  attach_to_untracked = true,
+  current_line_blame = false, -- Toggle with `:Gitsigns toggle_current_line_blame`
+  current_line_blame_opts = {
+    virt_text = true,
+    virt_text_pos = 'eol', -- 'eol' | 'overlay' | 'right_align'
+    delay = 1000,
+    ignore_whitespace = false,
+    virt_text_priority = 100,
+  },
+  current_line_blame_formatter = '<author>, <author_time:%Y-%m-%d> - <summary>',
+  sign_priority = 6,
+  update_debounce = 100,
+  status_formatter = nil, -- Use default
+  max_file_length = 40000, -- Disable if file is longer than this (in lines)
+  preview_config = {
+    -- Options passed to nvim_open_win
+    border = 'single',
+    style = 'minimal',
+    relative = 'cursor',
+    row = 0,
+    col = 1
+  },
+  yadm = {
+    enable = false
+  },
+}

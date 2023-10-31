@@ -19,3 +19,15 @@ augroup END
 nnoremap <silent> <Leader>gb :Git blame<CR>
 nnoremap <silent> <Leader>go :GBrowse <CR>
 nnoremap <silent> <Leader>gd :Gdiffsplit<CR>
+
+set termguicolors
+
+nnoremap <c-p> :Telescope find_files<cr>
+nnoremap <c-i> :Telescope live_grep<cr>
+nnoremap <c-o> :Telescope file_browser<cr>
+set numberwidth=3
+
+nnoremap J :BufferPrevious<cr>
+nnoremap K :BufferNext<cr>
+nnoremap Q :BufferClose<cr>
+nnoremap W :BufferClose<cr>
