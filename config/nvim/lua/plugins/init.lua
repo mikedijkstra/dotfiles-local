@@ -26,6 +26,7 @@ return {
         "prettier",
         "eslint-lsp",
         "vue-language-server",
+        "tailwindcss-language-server",
       },
     },
   },
@@ -67,7 +68,12 @@ return {
   },
   {
     "nvim-treesitter/nvim-treesitter",
+    dependencies = {
+      { "windwp/nvim-ts-autotag" },
+    },
     opts = {
+      autopairs = { enable = true },
+      autotag = { enable = true },
       ensure_installed = {
         "vim",
         "lua",
@@ -128,4 +134,10 @@ return {
       "Gbrowse",
     },
   },
+  {
+    "andymass/vim-matchup",
+    event = "BufReadPost",
+  },
+  { "windwp/nvim-autopairs", event = "InsertEnter", config = true },
+  { "windwp/nvim-ts-autotag", event = "BufReadPre" },
 }

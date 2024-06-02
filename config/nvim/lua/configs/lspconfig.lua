@@ -19,8 +19,6 @@ for _, lsp in ipairs(servers) do
   }
 end
 
-lspconfig.volar.setup {}
-
 -- typescript
 lspconfig.tsserver.setup {
   on_attach = on_attach,
@@ -39,3 +37,6 @@ lspconfig.tsserver.setup {
   },
   filetypes = { "typescript", "javascript", "javascriptreact", "typescriptreact", "vue" },
 }
+
+lspconfig.volar.setup {}
+lspconfig.tailwindcss.setup {}
