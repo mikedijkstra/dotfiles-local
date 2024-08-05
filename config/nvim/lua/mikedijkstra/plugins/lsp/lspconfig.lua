@@ -185,6 +185,9 @@ return {
 					end,
 				})
 			end,
+			["css_variables"] = function()
+				lspconfig["css_variables"].setup({})
+			end,
 		})
 	end,
 }

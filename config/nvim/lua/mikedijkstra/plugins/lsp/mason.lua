@@ -40,6 +40,7 @@ return {
 				"tailwindcss",
 				"eslint",
 				"volar",
+				"css_variables",
 			},
 		})
 
