@@ -1,2 +1,3 @@
 alias vim="nvim"
 alias cs="tmuxp load climatesalad --yes"
+alias compassv2="tmuxp load compassv2 --yes"

@@ -1,0 +1,14 @@
+session_name: compass-v2
+start_directory: ~/Code/compass-v2
+windows:
+  - window_name: editor
+    focus: true
+    layout: even-horizontal
+    panes:
+      - shell_command:
+          - nvim
+  - window_name: servers
+    layout: tiled
+    panes:
+      - shell_command:
+          - yarn frontend dev

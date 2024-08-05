@@ -1,0 +1,14 @@
+session_name: hamilton-centre
+start_directory: ~/Code/hamilton-centre
+windows:
+  - window_name: editor
+    focus: true
+    layout: even-horizontal
+    panes:
+      - shell_command:
+          - nvim
+  - window_name: servers
+    layout: tiled
+    panes:
+      - shell_command:
+        - yarn dev:secure
