@@ -82,7 +82,8 @@ return {
 			})
 
 			local keymap = vim.keymap
-			keymap.set("n", "<leader>ee", "<cmd>NvimTreeToggle<CR>", { desc = "Toggle file explorer" }) -- toggle file explorer
+			keymap.set("n", "<leader>ee", "<cmd>NvimTreeToggle<CR>", { desc = "Toggle file explorer" })
+			keymap.set("n", "<leader><leader>", "<cmd>NvimTreeFindFile<CR>", { noremap = true, silent = true })
 			keymap.set(
 				"n",
 				"<leader>ef",
@@ -152,7 +153,8 @@ return {
 		version = "*",
 		opts = {
 			options = {
-				mode = "tabs",
+				--mode = "tabs",
+				diagnostics = "nvim_lsp",
 			},
 		},
 	},
@@ -277,6 +279,7 @@ return {
 					"c",
 					"vue",
 					"scss",
+					"php",
 				},
 				incremental_selection = {
 					enable = true,
@@ -288,6 +291,16 @@ return {
 					},
 				},
 			})
+
+			local parser_config = require("nvim-treesitter.parsers").get_parser_configs()
+			parser_config.blade = {
+				install_info = {
+					url = "https://github.com/EmranMR/tree-sitter-blade",
+					files = { "src/parser.c" },
+					branch = "main",
+				},
+				filetype = "blade",
+			}
 		end,
 	},
 	{
@@ -407,6 +420,7 @@ return {
 					javascriptreact = { "prettier" },
 					typescriptreact = { "prettier" },
 					svelte = { "prettier" },
+					vue = { "prettier" },
 					css = { "prettier" },
 					html = { "prettier" },
 					json = { "prettier" },
@@ -414,13 +428,16 @@ return {
 					markdown = { "prettier" },
 					graphql = { "prettier" },
 					liquid = { "prettier" },
+					ruby = { "prettier" },
 					lua = { "stylua" },
 					python = { "isort", "black" },
+					php = { "prettier" },
+					blade = { "blade-formatter" },
 				},
 				format_on_save = {
 					lsp_fallback = true,
 					async = false,
-					timeout_ms = 1000,
+					timeout_ms = 2500,
 				},
 			})
 
@@ -447,6 +464,7 @@ return {
 		"lewis6991/gitsigns.nvim",
 		event = { "BufReadPre", "BufNewFile" },
 		opts = {
+			attach_to_untracked = true,
 			on_attach = function(bufnr)
 				local gs = package.loaded.gitsigns
 
@@ -478,7 +496,7 @@ return {
 				map("n", "<leader>hb", function()
 					gs.blame_line({ full = true })
 				end, "Blame line")
-				map("n", "<leader>hB", gs.toggle_current_line_blame, "Toggle line blame")
+				-- map("n", "<leader>hB", gs.toggle_current_line_blame, "Toggle line blame")
 
 				map("n", "<leader>hd", gs.diffthis, "Diff this")
 				map("n", "<leader>hD", function()
@@ -535,4 +553,143 @@ return {
 			debounce = 200,
 		},
 	},
+	{
+		"epwalsh/obsidian.nvim",
+		version = "*", -- recommended, use latest release instead of latest commit
+		lazy = true,
+		-- ft = "markdown",
+		-- Replace the above line with this if you only want to load obsidian.nvim for markdown files in your vault:
+		event = {
+			-- If you want to use the home shortcut '~' here you need to call 'vim.fn.expand'.
+			-- E.g. "BufReadPre " .. vim.fn.expand "~" .. "/my-vault/*.md"
+			-- refer to `:h file-pattern` for more examples
+			"BufReadPre /Users/michaeldijkstra/Library/Mobile Documents/iCloud~md~obsidian/Documents/Cloud/*.md",
+			"BufNewFile /Users/michaeldijkstra/Library/Mobile Documents/iCloud~md~obsidian/Documents/Cloud/*.md",
+		},
+		dependencies = {
+			-- Required.
+			"nvim-lua/plenary.nvim",
+
+			-- see below for full list of optional dependencies 👇
+		},
+		opts = {
+			workspaces = {
+				{
+					name = "Vault",
+					path = "/Users/michaeldijkstra/Library/Mobile Documents/iCloud~md~obsidian/Documents/Cloud",
+				},
+			},
+			templates = {
+				folder = "Templates",
+				date_format = "%Y-%m-%d-%a",
+				time_format = "%H:%M",
+			},
+			notes_subdir = "Notes",
+			daily_notes = {
+				-- Optional, if you keep daily notes in a separate directory.
+				folder = "Dailies",
+				-- Optional, if you want to change the date format for the ID of daily notes.
+				date_format = "%Y/%m-%d",
+				-- Optional, if you want to change the date format of the default alias of daily notes.
+				alias_format = "%B %-d, %Y",
+				-- Optional, default tags to add to each new daily note created.
+				default_tags = { "daily-notes" },
+			},
+			note_id_func = function(title)
+				return title:gsub(" ", "-"):gsub("[^A-Za-z0-9-]", ""):lower()
+			end,
+		},
+	},
+	{
+		"tpope/vim-fugitive",
+		cmd = "Git",
+		config = function() end,
+	},
+	{
+		"yetone/avante.nvim",
+		event = "VeryLazy",
+		lazy = false,
+		version = false, -- set this if you want to always pull the latest change
+		opts = {
+			auto_suggestions_provider = "copilot",
+			-- provider = "ollama",
+			-- vendors = {
+			-- 	ollama = {
+			-- 		__inherited_from = "openai",
+			-- 		api_key_name = "",
+			-- 		endpoint = "http://127.0.0.1:11434/v1",
+			-- 		model = "qwen2.5-coder:latest",
+			-- 	},
+			-- },
+		},
+		-- if you want to build from source then do `make BUILD_FROM_SOURCE=true`
+		build = "make",
+		-- build = "powershell -ExecutionPolicy Bypass -File Build.ps1 -BuildFromSource false" -- for windows
+		dependencies = {
+			"nvim-treesitter/nvim-treesitter",
+			"stevearc/dressing.nvim",
+			"nvim-lua/plenary.nvim",
+			"MunifTanjim/nui.nvim",
+			--- The below dependencies are optional,
+			"nvim-tree/nvim-web-devicons", -- or echasnovski/mini.icons
+			"zbirenbaum/copilot.lua", -- for providers='copilot'
+			{
+				-- support for image pasting
+				"HakonHarnes/img-clip.nvim",
+				event = "VeryLazy",
+				opts = {
+					-- recommended settings
+					default = {
+						embed_image_as_base64 = false,
+						prompt_for_file_name = false,
+						drag_and_drop = {
+							insert_mode = true,
+						},
+						-- required for Windows users
+						use_absolute_path = true,
+					},
+				},
+			},
+			{
+				-- Make sure to set this up properly if you have lazy=true
+				"MeanderingProgrammer/render-markdown.nvim",
+				opts = {
+					file_types = { "markdown", "Avante" },
+				},
+				ft = { "markdown", "Avante" },
+			},
+		},
+	},
+	-- {
+	-- 	"olimorris/codecompanion.nvim",
+	-- 	dependencies = {
+	-- 		"nvim-lua/plenary.nvim",
+	-- 		"nvim-treesitter/nvim-treesitter",
+	-- 	},
+	-- 	config = function()
+	-- 		require("codecompanion").setup({
+	-- 			adapters = {},
+	-- 			strategies = {
+	-- 				chat = {
+	-- 					adapter = "copilot",
+	-- 				},
+	-- 				inline = {
+	-- 					adapter = "copilot",
+	-- 				},
+	-- 			},
+	-- 		})
+	-- 	end,
+	-- },
+	-- {
+	-- 	"CopilotC-Nvim/CopilotChat.nvim",
+	-- 	dependencies = {
+	-- 		{ "github/copilot.vim" }, -- or zbirenbaum/copilot.lua
+	-- 		{ "nvim-lua/plenary.nvim", branch = "master" }, -- for curl, log and async functions
+	-- 	},
+	-- 	build = "make tiktoken", -- Only on MacOS or Linux
+	-- 	opts = {
+	-- 		-- See Configuration section for options
+	-- 	},
+	-- 	-- See Commands section for default commands if you want to lazy load on them
+	-- },
 }

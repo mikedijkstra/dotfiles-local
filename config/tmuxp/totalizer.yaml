@@ -1,0 +1,27 @@
+session_name: totalizer
+start_directory: ~/Code/totalizer
+shell_command_before:
+  - cmd: source .venv/bin/activate
+windows:
+  - window_name: web
+    focus: true
+    layout: even-horizontal
+    panes:
+      - shell_command:
+          - cd web
+          - nvim
+  - window_name: ai
+    layout: even-horizontal
+    panes:
+      - shell_command:
+          - cd ai
+          - nvim
+  - window_name: servers
+    layout: even-vertical
+    panes:
+      - shell_command:
+          - cd ai
+          - python app.py
+      - shell_command:
+          - cd web
+          - bundle exec rake solid_queue:start

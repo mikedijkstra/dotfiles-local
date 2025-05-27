@@ -1,2 +1,7 @@
 . /opt/homebrew/opt/asdf/libexec/asdf.sh
+export EDITOR=nvim
 export ASDF_NODEJS_LEGACY_FILE_DYNAMIC_STRATEGY=latest_available
+function yy() {
+	yazi
+}
+export PATH="$PATH:/Users/michaeldijkstra/.local/share/gem/ruby/3.3.0/bin"

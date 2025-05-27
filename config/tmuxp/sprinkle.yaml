@@ -1,0 +1,13 @@
+session_name: sprinkle
+start_directory: ~/Code/sprinkle-app
+windows:
+  - window_name: editor
+    focus: true
+    layout: even-horizontal
+    panes:
+      - shell_command:
+          - nvim
+  - window_name: servers
+    layout: tiled
+    panes:
+      - shell_command:

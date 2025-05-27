@@ -1,0 +1,20 @@
+session_name: wink
+start_directory: ~/Code/wink
+windows:
+  - window_name: dashboard
+    focus: true
+    layout: even-horizontal
+    panes:
+      - shell_command:
+          - cd dashboard
+          - vim
+  - window_name: servers
+    layout: even-vertical
+    panes:
+      - shell_command:
+          - cd dashboard
+          - sail npm run dev
+      - shell_command:
+          - cd dashboard
+          - sail up -d
+          - sail artisan queue:work --queue default,rakuten,commission-factory,impact,partnerize

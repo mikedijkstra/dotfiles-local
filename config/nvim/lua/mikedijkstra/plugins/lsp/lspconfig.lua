@@ -59,8 +59,8 @@ return {
 				opts.desc = "Go to next diagnostic"
 				keymap.set("n", "]d", vim.diagnostic.goto_next, opts) -- jump to next diagnostic in buffer
 
-				opts.desc = "Show documentation for what is under cursor"
-				keymap.set("n", "K", vim.lsp.buf.hover, opts) -- show documentation for what is under cursor
+				--opts.desc = "Show documentation for what is under cursor"
+				--keymap.set("n", "K", vim.lsp.buf.hover, opts) -- show documentation for what is under cursor
 
 				opts.desc = "Restart LSP"
 				keymap.set("n", "<leader>rs", ":LspRestart<CR>", opts) -- mapping to restart lsp if necessary
@@ -147,23 +147,40 @@ return {
 					},
 				})
 			end,
-			["tsserver"] = function()
-				lspconfig["tsserver"].setup({
+			["volar"] = function()
+				lspconfig["volar"].setup({
+					filetypes = { "vue" },
 					init_options = {
-						preferences = {
-							disableSuggestions = true,
+						vue = {
+							hybridMode = false,
 						},
+						-- NOTE: This might not be needed. Uncomment if you encounter issues.
+						typescript = {
+							tsdk = vim.fn.getcwd() .. "/node_modules/typescript/lib",
+						},
+					},
+				})
+			end,
+
+			["ts_ls"] = function()
+				local mason_packages = vim.fn.stdpath("data") .. "/mason/packages"
+				local volar_path = mason_packages .. "/vue-language-server/node_modules/@vue/language-server"
+
+				lspconfig["ts_ls"].setup({
+					-- NOTE: To enable hybridMode, change HybrideMode to true above and uncomment the following filetypes block.
+					--filetypes = { "typescript", "javascript", "javascriptreact", "typescriptreact" },
+					init_options = {
 						plugins = {
 							{
 								name = "@vue/typescript-plugin",
-								location = vue_language_server_path,
-								languages = { "javascript", "typescript", "vue" },
+								location = volar_path,
+								languages = { "vue" },
 							},
 						},
 					},
-					filetypes = { "typescript", "javascript", "javascriptreact", "typescriptreact", "vue" },
 				})
 			end,
+
 			["tailwindcss"] = function()
 				lspconfig["tailwindcss"].setup({})
 			end,
@@ -177,17 +194,47 @@ return {
 					end,
 				})
 			end,
-			["volar"] = function()
-				-- configure lua server (with special settings)
-				lspconfig["volar"].setup({
-					on_new_config = function(new_config, new_root_dir)
-						new_config.init_options.typescript.tsdk = get_typescript_server_path(new_root_dir)
-					end,
-				})
-			end,
 			["css_variables"] = function()
 				lspconfig["css_variables"].setup({})
 			end,
+			["ruby_lsp"] = function()
+				lspconfig["ruby_lsp"].setup({})
+			end,
+			["phpactor"] = function()
+				lspconfig["phpactor"].setup({
+					root_dir = lspconfig.util.root_pattern(".git", ".phpactor.json", ".phpactor.yml"),
+				})
+			end,
+			["denols"] = function()
+				lspconfig["denols"].setup({
+					root_dir = lspconfig.util.root_pattern("deno.json", "deno.jsonc"),
+					on_attach = function(client, bufnr)
+						-- Optional: Disable tsserver for deno projects
+						client.resolved_capabilities.document_formatting = false
+					end,
+					-- Lazy load by filetype
+					filetypes = { "typescript", "typescriptreact", "typescript.tsx" },
+				})
+			end,
+		})
+
+		require("lspconfig").dartls.setup({
+			cmd = { "dart", "language-server", "--protocol=lsp" },
+			filetypes = { "dart" },
+			init_options = {
+				closingLabels = true,
+				flutterOutline = true,
+				onlyAnalyzeProjectsWithOpenFiles = true,
+				outline = true,
+				suggestFromUnimportedLibraries = true,
+			},
+			-- root_dir = root_pattern("pubspec.yaml"),
+			settings = {
+				dart = {
+					completeFunctionCalls = true,
+					showTodos = true,
+				},
+			},
 		})
 	end,
 }

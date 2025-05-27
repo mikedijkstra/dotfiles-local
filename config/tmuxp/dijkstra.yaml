@@ -1,0 +1,14 @@
+session_name: dijkstra
+start_directory: ~/Code/dijkstra-astro
+windows:
+  - window_name: app
+    focus: true
+    layout: even-horizontal
+    panes:
+      - shell_command:
+          - nvim
+  - window_name: servers
+    focus: true
+    layout: even-horizontal
+    panes:
+      - npm run dev

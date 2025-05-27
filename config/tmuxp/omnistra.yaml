@@ -1,0 +1,16 @@
+session_name: omnistra
+start_directory: ~/Code/omnistra
+shell_command_before:
+  - cmd: source .venv/bin/activate
+windows:
+  - window_name: app
+    focus: true
+    layout: even-horizontal
+    panes:
+      - shell_command:
+          - nvim
+  - window_name: server
+    layout: even-vertical
+    panes:
+      - shell_command:
+          - fastapi dev main.py

@@ -1,3 +1,33 @@
 alias vim="nvim"
-alias cs="tmuxp load climatesalad --yes"
-alias compassv2="tmuxp load compassv2 --yes"
+
+tm() {
+  local project="$1"
+  tmuxp load "$project" --yes
+}
+
+_tm_autocomplete() {
+  local tmuxp_dir=~/.config/tmuxp  # Replace with the path to your tmuxp directory
+  local files
+
+  # Find .yaml or .yml files in the tmuxp directory
+  files=("${tmuxp_dir}"/*.yaml "${tmuxp_dir}"/*.yml)
+
+  # Check if any files match; if not, exit early
+  [[ -e "${tmuxp_dir}" ]] || return
+
+  # Remove the directory path and extensions
+  files=("${files[@]##*/}")         # Strip directory path
+  files=("${files[@]%.yaml}")       # Remove `.yaml`
+  files=("${files[@]%.yml}")        # Remove `.yml`
+
+  # Deduplicate filenames
+  files=("${(@u)files}")
+
+  # Provide trimmed filenames for autocompletion
+  compadd -- "${files[@]}"
+}
+
+compdef _tm_autocomplete tm
+
+alias sail='[ -f sail ] && sh sail || sh vendor/bin/sail'
+alias vapor='sail php vendor/bin/vapor'

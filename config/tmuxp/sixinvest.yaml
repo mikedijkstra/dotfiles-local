@@ -1,0 +1,24 @@
+session_name: sixinvest
+start_directory: ~/Code/sixinvest
+windows:
+  - window_name: app
+    focus: true
+    layout: even-horizontal
+    panes:
+      - shell_command:
+          - cd six-web-app
+  - window_name: sst
+    layout: even-horizontal
+    panes:
+      - shell_command:
+          - cd six-sst-app
+  - window_name: serves
+    layout: even-vertical
+    panes:
+      - shell_command:
+          - cd six-web-app
+          - yarn dev
+      - shell_command:
+          - cd six-sst-app
+          - export AWS_PROFILE=six
+          - pnpm run dev

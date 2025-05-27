@@ -1,0 +1,16 @@
+session_name: starter
+start_directory: ~/Code/laravel-starter
+windows:
+  - window_name: editor
+    focus: true
+    layout: even-horizontal
+    panes:
+      - shell_command:
+          - nvim
+  - window_name: servers
+    layout: tiled
+    panes:
+      - shell_command:
+          - yarn dev
+      - shell_command:
+          - yarn backend sail up -d

@@ -1,0 +1,9 @@
+session_name: vanlife
+start_directory: ~/Godot/VanLife2D
+windows:
+  - window_name: editor
+    focus: true
+    layout: even-horizontal
+    panes:
+      - shell_command:
+          -

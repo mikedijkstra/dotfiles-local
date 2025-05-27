@@ -29,3 +29,35 @@ opt.clipboard:append("unnamedplus")
 
 opt.splitright = true
 opt.splitbelow = true
+
+-- Set for obsidian
+opt.conceallevel = 1
+
+local group = vim.api.nvim_create_augroup("Markdown Wrap Settings", { clear = true })
+vim.api.nvim_create_autocmd("BufEnter", {
+	pattern = { "*.md" },
+	group = group,
+	command = "setlocal wrap",
+})
+
+vim.api.nvim_create_autocmd("FileType", {
+	pattern = "markdown",
+	callback = function()
+		-- Enable soft wrapping
+		vim.opt_local.textwidth = 120
+	end,
+})
+
+-- highlight codefences returned from denols
+vim.g.markdown_fenced_languages = {
+	"ts=typescript",
+}
+
+vim.filetype.add({
+	pattern = {
+		[".*%.blade%.php"] = "blade",
+	},
+})
+
+-- Recommended by avante
+vim.opt.laststatus = 3
