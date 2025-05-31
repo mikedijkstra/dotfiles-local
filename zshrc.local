@@ -8,3 +8,6 @@ _cslogs_complete() {
 }
 
 compdef _cslogs_complete cslogs
+
+export BEGIN_INSTALL="/home/stra/.begin"
+export PATH="$BEGIN_INSTALL:$PATH"

@@ -26,13 +26,16 @@ cmp.setup({
     }),
   }),
   sources = cmp.config.sources({
-    { name = 'nvim_lsp' },
-    { name = 'buffer' },
+    { name = 'nvim_lsp', keyword_length = 1 },
+    { name = 'buffer', keyword_length = 3 },
+    { name = 'luasnip', keyword_length = 2 },
   }),
   formatting = {
     format = lspkind.cmp_format({ with_text = false, maxwidth = 50 })
   }
 })
+
+require('luasnip.loaders.from_vscode').lazy_load()
 
 vim.cmd [[
   set completeopt=menuone,noinsert,noselect
@@ -66,7 +69,8 @@ ts.setup {
     "typescript",
     "javascript",
     "markdown",
-    "markdown_inline"
+    "markdown_inline",
+    "jsdoc"
   },
   autotag = {
     enable = true,
@@ -210,7 +214,9 @@ nvim_lsp.tsserver.setup {
   filetypes = { "typescript", "typescriptreact", "typescript.tsx", "javascript" },
   cmd = { "typescript-language-server", "--stdio" }
 }
-nvim_lsp.html.setup{}
+nvim_lsp.html.setup{
+  filetypes = { "html" },
+}
 nvim_lsp.jsonls.setup{}
 nvim_lsp.tailwindcss.setup{}
 nvim_lsp.cssls.setup{}

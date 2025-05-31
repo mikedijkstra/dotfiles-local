@@ -31,3 +31,5 @@ nnoremap J :BufferPrevious<cr>
 nnoremap K :BufferNext<cr>
 nnoremap Q :BufferClose!<cr>
 nnoremap W :BufferClose<cr>
+
+let g:html_indent_style1 = "inc"
